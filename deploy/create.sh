@@ -38,20 +38,20 @@ aws ec2 run-instances \
   --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=10.0.0.5,Groups=${SECURITY_GROUP},SubnetId=${SUBNET}" \
   --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=frontend}]"
 
-#aws ec2 run-instances \
-#  --image-id "ami-0d7ed3ddb85b521a6" \
-#  --instance-type "${INSTANCE_TYPE}" \
-#  --key-name "demo-key-pair" \
-#  --iam-instance-profile "Name=${IAM_INSTANCEPROFILE_SSM}" \
-#  --user-data "file://user-data.sh" \
-#  --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=10.0.0.5,Groups=${SECURITY_GROUP},SubnetId=${SUBNET}" \
-#  --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=backend}]"
+aws ec2 run-instances \
+  --image-id "ami-0d7ed3ddb85b521a6" \
+  --instance-type "${INSTANCE_TYPE}" \
+  --key-name "demo-key-pair" \
+  --iam-instance-profile "Name=${IAM_INSTANCEPROFILE_SSM}" \
+  --user-data "file://user-data.sh" \
+  --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=10.0.0.105,Groups=${SECURITY_GROUP},SubnetId=${SUBNET}" \
+  --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=backend}]"
 
-#aws ec2 run-instances \
-#  --image-id "ami-0d7ed3ddb85b521a6" \
-#  --instance-type "${INSTANCE_TYPE}" \
-#  --key-name "demo-key-pair" \
-#  --iam-instance-profile "Name=${IAM_INSTANCEPROFILE_SSM}" \
-#  --user-data "file://user-data.sh" \
-#  --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=10.0.0.5,Groups=${SECURITY_GROUP},SubnetId=${SUBNET}" \
-#  --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
+aws ec2 run-instances \
+  --image-id "ami-0d7ed3ddb85b521a6" \
+  --instance-type "${INSTANCE_TYPE}" \
+  --key-name "demo-key-pair" \
+  --iam-instance-profile "Name=${IAM_INSTANCEPROFILE_SSM}" \
+  --user-data "file://user-data.sh" \
+  --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=10.0.0.205,Groups=${SECURITY_GROUP},SubnetId=${SUBNET}" \
+  --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
