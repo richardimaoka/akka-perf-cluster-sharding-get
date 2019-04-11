@@ -5,6 +5,6 @@ service docker start
 usermod -a -G docker ec2-user
 yum -y install git
 cd /home/ec2-user
-git clone https://github.com/richardimaoka/akka-cluster-sharding-perf
-cd akka-cluster-sharding-perf
-docker build .
+git clone https://github.com/richardimaoka/akka-perf-cluster-sharding-get
+cd akka-perf-cluster-sharding-get
+docker build . -t richard-perf-wrk:latest
