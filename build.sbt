@@ -5,17 +5,23 @@ ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "com.example"
 ThisBuild / organizationName := "example"
 
+val JackSonVersion = "2.9.8"
+val AkkaVersion = "2.5.20"
+val AkkaHttpVersion = "10.1.7"
+
 lazy val root = (project in file("."))
   .settings(
     name := "akka-perf-cluster-sharding-get",
     libraryDependencies ++= Seq(
-      "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.8",
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.8",
-      "com.typesafe.akka" %% "akka-cluster" % "2.5.20",
-      "com.typesafe.akka" %% "akka-cluster-sharding" % "2.5.20",
-      "com.typesafe.akka" %% "akka-stream" % "2.5.20",
-      "com.typesafe.akka" %% "akka-http"   % "10.1.7",
-      "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.7",
+      "com.fasterxml.jackson.core" % "jackson-databind" % JackSonVersion,
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % JackSonVersion,
+      "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % "1.0.0",
+      "com.typesafe.akka" %% "akka-cluster" % AkkaVersion,
+      "com.typesafe.akka" %% "akka-cluster-sharding" % AkkaVersion,
+      "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+      "com.typesafe.akka" %% "akka-discovery" % AkkaVersion,
+      "com.typesafe.akka" %% "akka-http"   % AkkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
       "io.spray" %%  "spray-json" % "1.3.5"
     )
   )
