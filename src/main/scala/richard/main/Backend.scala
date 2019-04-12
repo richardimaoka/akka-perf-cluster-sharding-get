@@ -2,7 +2,6 @@ package richard.main
 
 import akka.actor.{ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
-import akka.discovery.Discovery
 import com.typesafe.config.ConfigFactory
 import richard.backend.actor.IdActor
 
@@ -12,7 +11,7 @@ object Backend {
   def main(args: Array[String]): Unit = {
     val config = ConfigFactory.load("backend.conf")
     val system = ActorSystem(config.getString("actor-system-name"), config)
-    val serviceDiscovery = Discovery(system).discovery
+
     val shardRegion = ClusterSharding(system).start(
       typeName = "IdActor",
       entityProps = Props[IdActor],
