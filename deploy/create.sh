@@ -9,7 +9,7 @@ set -e
 # Create a Cloudformation stack from the local template `cloudformation-vpc.yaml`
 VPC_STACK_NAME="bench-vpc"
 SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
-INSTANCE_TYPE="t2.micro"
+INSTANCE_TYPE="t2.medium"
 
 aws cloudformation create-stack \
   --stack-name "${VPC_STACK_NAME}" \
@@ -22,8 +22,11 @@ aws cloudformation wait stack-create-complete --stack-name "${VPC_STACK_NAME}"
 
 # Variables to be passed upon EC2 creation in the next step
 DESCRIBED=$(aws cloudformation describe-stacks --stack-name "${VPC_STACK_NAME}")
+
 SUBNET=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "Subnet") | .OutputValue')
+
 SECURITY_GROUP=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "SecurityGroup") | .OutputValue')
+
 IAM_INSTANCEPROFILE_SSM=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "InstanceProfile") | .OutputValue')
 
 # Create EC2 instances. Since CloudFormation doesn't support creation of a variable number of EC2 instances,
