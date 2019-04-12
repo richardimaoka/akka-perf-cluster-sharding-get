@@ -15,7 +15,7 @@ object Frontend {
     implicit val executionContext = system.dispatcher
 
     val httpRoutes = new IdRoute(system)
-    Http().bindAndHandle(httpRoutes.route, "localhost", 8080)
+    Http().bindAndHandle(httpRoutes.route, config.getString("akka.remote.netty.tcp.hostname"), 8080)
 
     if(scala.io.StdIn.readLine() != null)
       system.terminate()
