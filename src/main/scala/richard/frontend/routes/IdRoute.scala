@@ -9,7 +9,7 @@ import richard.backend.actor.IdActor
 
 import scala.concurrent.duration._
 
-class IdRoute(system: ActorSystem) {
+class IdRoute(system: ActorSystem, actorIds: List[String]) {
 
   val proxyShardRegion: ActorRef = ClusterSharding(system).startProxy(
     typeName = "IdActor",
@@ -21,10 +21,17 @@ class IdRoute(system: ActorSystem) {
   // timeout for the actor ask pattern (i.e. `?` method)
   implicit val timeout: Timeout = 30.seconds
   val route =
-    path(Segment) { uuid =>
-      get {
-        val ret = (proxyShardRegion ? IdActor.Get(uuid)).mapTo[String]
-        complete(ret)
+    pathPrefix("actors") {
+      pathEndOrSingleSlash {
+        get {
+          complete(actorIds.mkString("\n"))
+        }
+      } ~
+      path(Segment) { uuid =>
+        get {
+          val ret = (proxyShardRegion ? IdActor.Get(uuid)).mapTo[String]
+          complete(ret)
+        }
       }
     }
 }

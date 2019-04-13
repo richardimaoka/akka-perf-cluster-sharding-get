@@ -1,9 +1,0 @@
-FROM hseeberger/scala-sbt:8u181_2.12.8_1.2.8
-WORKDIR /app
-COPY project project
-COPY src src
-COPY build.sbt build.sbt
-COPY data data
-COPY ssm-scripts ssm-scripts
-RUN sbt -batch clean compile stage
-CMD ["target/universal/stage/bin/datagen"]

@@ -7,12 +7,19 @@ class IdActor extends Actor {
   import richard.backend.actor.IdActor._
   var _id: String = ""
 
-  def receive: Receive = {
+  def receiveUninitialized: Receive = {
     case Create(i) =>
       _id = i
-      //println(s"IdActor(${_id}) started")
+      context.become(receiveInitialized)
+    case _ =>
+      context.stop(self)
+  }
+
+  def receiveInitialized: Receive = {
     case Get(_) => sender() ! _id
   }
+
+  def receive: Receive = receiveUninitialized
 }
 
 object IdActor {
@@ -26,7 +33,7 @@ object IdActor {
     case msg @ Get(id) => (id, msg)
   }
   val extractShardId: ShardRegion.ExtractShardId = {
-    case msg @ Create(id) => (id.hashCode % numberOfShards).toString
-    case msg @ Get(id) => (id.hashCode % numberOfShards).toString
+    case Create(id) => (id.hashCode % numberOfShards).toString
+    case Get(id) => (id.hashCode % numberOfShards).toString
   }
 }
