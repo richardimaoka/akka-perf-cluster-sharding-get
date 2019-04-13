@@ -56,9 +56,9 @@ do
 done
 
 # Run wrk
-# Mounting the current directory to wrk container's WORKDIR = '/data'
-
-WRK_CMD="docker run -v $(pwd):/scripts/remote williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s "/scripts/remote/wrk_script.lua" ${TARGET_URL}"
+# Using the --network host to reach out to other EC2 instances via their EC2 IPV4
+# and mounting the current directory to wrk container's WORKDIR = '/data'
+WRK_CMD="docker run --network host -v $(pwd):/data williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s "wrk_script.lua" ${TARGET_URL}"
 echo "running:"
 echo "${WRK_CMD}"
 ${WRK_CMD}
