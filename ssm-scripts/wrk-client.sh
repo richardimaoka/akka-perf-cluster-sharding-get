@@ -50,10 +50,6 @@ do
     esac
 done
 
-docker run \
-  -v $(pwd):/data \
-  williamyeh/wrk \
-
 # Run wrk
 # Mounting the current directory to wrk container's WORKDIR = '/data'
 WRK_CMD="docker run -v $(pwd):/data williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s wrk_json.lua ${TARGET_URL}"
