@@ -6,6 +6,11 @@ cd "$(dirname "$0")"
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
 
+# default values
+threads=4
+connections=8
+duration=30
+
 # parse options, note that whitespace is needed (e.g. -c 4) between an option and the option argument
 #  -c, --connections <N>  Connections to keep open
 #  -d, --duration    <T>  Duration of test
@@ -52,6 +57,7 @@ done
 
 # Run wrk
 # Mounting the current directory to wrk container's WORKDIR = '/data'
+
 WRK_CMD="docker run -v $(pwd):/scripts/remote williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s "/scripts/remote/wrk_script.lua" ${TARGET_URL}"
 echo "running:"
 echo "${WRK_CMD}"
