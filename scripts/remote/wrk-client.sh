@@ -52,7 +52,7 @@ done
 
 # Run wrk
 # Mounting the current directory to wrk container's WORKDIR = '/data'
-WRK_CMD="docker run -v $(pwd):/data williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s wrk_script.lua ${TARGET_URL}"
+WRK_CMD="docker run -v $(pwd):/data williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s $(pwd):/wrk_script.lua ${TARGET_URL}"
 echo "running:"
 echo "${WRK_CMD}"
 ${WRK_CMD}
