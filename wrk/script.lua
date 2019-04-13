@@ -26,22 +26,32 @@ function load_request_objects_from_file(file)
 end
 
 -- Load URL requests from file
-requests = load_request_objects_from_file("/data/requests.json")
+request_data = load_request_objects_from_file("/data/requests.json")
 
 -- Check if at least one path was found in the file
-if #requests <= 0 then
-  print("multiple requests: No requests found.")
+if #request_data <= 0 then
+  print("No requests found in the file.")
   os.exit()
 end
 
 print("multiple requests: Found " .. #requests .. " requests")
+
+requests = {}
+for i=1, #request_data do
+  requests[i] = wrk.format(
+    request_data.method,
+    request_data.path
+    -- request_data.headers,
+    -- request_data.body
+  )
+end
 
 -- Initialize the requests array iterator
 counter = 1
 
 request = function()
   -- Get the next requests array element
-  local request_object = requests[counter]
+  local requests = requests[counter]
 
   -- Increment the counter
   counter = counter + 1
@@ -52,5 +62,5 @@ request = function()
   end
 
   -- Return the request object with the current URL path
-  return wrk.format(request_object.method, request_object.path, request_object.headers, request_object.body)
+  return requests[i]
 end
