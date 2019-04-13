@@ -58,7 +58,8 @@ done
 # Run wrk
 # Using the --network host to reach out to other EC2 instances via their EC2 IPV4
 # and mounting the current directory to wrk container's WORKDIR = '/data'
-WRK_CMD="docker run --network host -v $(pwd):/data williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s "wrk_script.lua" ${TARGET_URL}"
+# Note that this mounting doesn't work on WSL Docker: see https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly#ensure-volume-mounts-work
+WRK_CMD="docker run --network host -v $(pwd):/data williamyeh/wrk -t ${threads} -c ${connections} -d ${duration} -s wrk_script.lua ${TARGET_URL}"
 echo "running:"
 echo "${WRK_CMD}"
 ${WRK_CMD}
