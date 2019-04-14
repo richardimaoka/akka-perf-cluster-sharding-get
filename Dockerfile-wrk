@@ -6,14 +6,14 @@ WORKDIR /data
 # https://stackoverflow.com/questions/48736212/bad-file-descriptor-error-during-apk-update-in-docker-container-why
 RUN rm -rf /var/cache/apk &&\
     mkdir /var/cache/apk &&\
-    apk add make lua5.3 lua5.3-dev outils-md5 &&\
+    apk add curl unzip gcc make alpine-sdk lua5.3 lua5.3-dev outils-md5 &&\
     wget https://luarocks.org/releases/luarocks-3.0.4.tar.gz &&\
     tar zxpf luarocks-3.0.4.tar.gz &&\
     cd luarocks-3.0.4 &&\
     ./configure  &&\
-    make bootstrap &&\
 # https://github.com/luarocks/luarocks/issues/901
-    USER=root &&\
+    export USER=root &&\
+    make bootstrap &&\
     luarocks install luasocket &&\
     luarocks install lua-cjson
 
