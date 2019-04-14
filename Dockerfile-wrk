@@ -1,0 +1,18 @@
+FROM williamyeh/wrk:4.0.2
+WORKDIR /data # The workdir of the base image
+
+RUN apk add make lua5.3 lua5.3-dev outils-md5 &&\
+    luarocks install luasocket
+
+RUN wget https://luarocks.org/releases/luarocks-3.0.4.tar.gz &&\
+    tar zxpf luarocks-3.0.4.tar.gz &&\
+    cd luarocks-3.0.4 &&\
+    ./configure  &&\
+    make bootstrap &&\
+    luarocks install luasocket &&\
+    luarocks install lua-cjson
+
+COPY scripts/remote scripts/remote
+
+ENTRYPOINT ["scripts/remote/wrk-client.sh"]
+
