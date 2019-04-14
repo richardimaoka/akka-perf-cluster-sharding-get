@@ -52,9 +52,6 @@ end
 counter = 1
 
 request = function()
-  -- Get the next requests array element
-  local requests = requests[counter]
-
   -- Increment the counter
   counter = counter + 1
 
