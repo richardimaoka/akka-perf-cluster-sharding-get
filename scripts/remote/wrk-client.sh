@@ -19,7 +19,7 @@ for OPT in "$@"
 do
     case "$OPT" in
         '-c'|'--connections' )
-            if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+            if [ -z "$2" ] || [ "$2" =~ ^-+ ]; then
                 echo "wrk: option -c or --connections requires an argument -- $1" 1>&2
                 exit 1
             fi
@@ -27,7 +27,7 @@ do
             shift 2
             ;;
         '-d'|'--duration' )
-            if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+            if [ -z "$2" ] || [ "$2" =~ ^-+ ]; then
                 echo "wrk: option -d or --duration requires an argument -- $1" 1>&2
                 exit 1
             fi
@@ -35,7 +35,7 @@ do
             shift 2
             ;;
         '-t'|'--threads' )
-            if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+            if [ -z "$2" ] || [ "$2" =~ ^-+ ]; then
                 echo "wrk: option -t or --threads requires an argument -- $1" 1>&2
                 exit 1
             fi
@@ -47,7 +47,7 @@ do
             exit 1
             ;;
         *)
-            if [[ -n "$1" ]] && [[ ! "$1" =~ ^-+ ]]; then
+            if [ ! -n "$1" ] && [ ! "$1" =~ ^-+ ]; then
                 TARGET_URL="$1"
                 break
             fi
