@@ -36,15 +36,15 @@ if #request_data <= 0 then
   os.exit()
 end
 
-print("multiple requests: Found " .. #requests .. " requests")
+print("multiple requests: Found " .. #request_data .. " request_data")
 
 requests = {}
 for i=1, #request_data do
   requests[i] = wrk.format(
-    request_data.method,
-    request_data.path
-    -- request_data.headers,
-    -- request_data.body
+    request_data[i].method,
+    request_data[i].path
+    -- request_data[i].headers,
+    -- request_data[i].body
   )
 end
 
