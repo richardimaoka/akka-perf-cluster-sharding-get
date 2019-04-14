@@ -1,5 +1,7 @@
 FROM williamyeh/wrk:4.0.2
-WORKDIR /data # The workdir of the base image
+
+# The workdir of the base image
+WORKDIR /data
 
 # https://stackoverflow.com/questions/48736212/bad-file-descriptor-error-during-apk-update-in-docker-container-why
 RUN rm -rf /var/cache/apk &&\
