@@ -12,6 +12,8 @@ RUN rm -rf /var/cache/apk &&\
     cd luarocks-3.0.4 &&\
     ./configure  &&\
     make bootstrap &&\
+# https://github.com/luarocks/luarocks/issues/901
+    USER=root &&\
     luarocks install luasocket &&\
     luarocks install lua-cjson
 
