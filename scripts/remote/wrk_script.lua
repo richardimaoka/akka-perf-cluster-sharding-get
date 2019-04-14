@@ -2,6 +2,8 @@
 
 -- Module instantiation
 local cjson = require "cjson"
+local cjson2 = cjson.new()
+local cjson_safe = require "cjson.safe"
 
 -- Load URL paths from the file
 function load_request_objects_from_file(file)
