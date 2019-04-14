@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 
 # cd to the current directory as it runs other shell scripts
 cd "$(dirname "$0")"
