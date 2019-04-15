@@ -23,6 +23,9 @@ aws cloudformation wait stack-create-complete --stack-name "${VPC_STACK_NAME}"
 # Variables to be passed upon EC2 creation in the next step
 DESCRIBED=$(aws cloudformation describe-stacks --stack-name "${VPC_STACK_NAME}")
 
+SUBNET_AZ=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "Subnet") | .OutputValue')
+SUBNET=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "Subnet") | .OutputValue')
+SUBNET=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "Subnet") | .OutputValue')
 SUBNET=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "Subnet") | .OutputValue')
 
 SECURITY_GROUP=$(echo $DESCRIBED | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "SecurityGroup") | .OutputValue')

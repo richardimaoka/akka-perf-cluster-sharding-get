@@ -1,0 +1,22 @@
+{
+  "wrk_instance": {
+    "instance_type": "t2.medium",
+    "subnet": "SubnetAz1a",
+    "ip_address_v4": "10.0.0.5"
+  },
+  "akka_http_instances": [
+    {
+      "instance_type": "t2.medium",
+      "subnet": "SubnetAz1a",
+      "ip_address_v4": "10.0.0.6"
+    }
+  ],
+  "akka_backend_instances": [
+    {
+      "instance_type": "t2.medium",
+      "subnet": "SubnetAz1a",
+      "ip_address_v4": "10.0.0.6",
+      "seed_node": true
+    }
+  ]
+}
