@@ -15,21 +15,20 @@ cd "$(dirname "$0")"
 
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
-# Enables a mode of the shell where all executed commands are printed to the termina
-set -x
 
 # Create a Cloudformation stack from the local template `cloudformation-vpc.yaml`
 VPC_STACK_NAME="bench-vpc"
 SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
 
+set -x # Enables a mode of the shell where all executed commands are printed to the termina
 aws cloudformation create-stack \
   --stack-name "${VPC_STACK_NAME}" \
   --template-body file://cloudformation-vpc.yaml \
   --capabilities CAPABILITY_NAMED_IAM \
   --parameters ParameterKey=SSHLocation,ParameterValue="${SSH_LOCATION}"
 
-echo "Waiting until the Cloudformation stack is CREATE_COMPLETE"
 aws cloudformation wait stack-create-complete --stack-name "${VPC_STACK_NAME}"
+set +x # Disables the previous `set -x`
 
 # Variables to be passed upon EC2 creation in the next step
 DESCRIBED=$(aws cloudformation describe-stacks --stack-name "${VPC_STACK_NAME}")
@@ -44,6 +43,7 @@ WRK_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$WRK_INSTANCE_SETTINGS")
 WRK_INSTANCE_SUBNET=$(jq -c '.subnet' "$WRK_INSTANCE_SETTINGS")
 WRK_INSTANCE_SUBNET_ID=$("${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${WRK_INSTANCE_SUBNET}) | .OutputValue")
 # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
+set -x # Enables a mode of the shell where all executed commands are printed to the termina
 aws ec2 run-instances \
   --image-id "ami-0d7ed3ddb85b521a6" \
   --instance-type "${WRK_INSTANCE_TYPE}" \
@@ -52,9 +52,11 @@ aws ec2 run-instances \
   - -user-data "file://user-data.sh" \
   --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${WRK_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${WRK_INSTANCE_SUBNET_ID}" \
   --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
+set +x # Disables the previous `set -x`
 
 for AKKA_BACKEND_SETTINGS in $(jq -c '.akka_backend_instances' "$EC2_SETTINGS")
 do
+  set -x # Enables a mode of the shell where all executed commands are printed to the termina
   AKKA_BACKEND_INSTANCE_TYPE=$(jq -c '.instance_type' "$AKKA_BACKEND_SETTINGS")
   AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$AKKA_BACKEND_SETTINGS")
   AKKA_BACKEND_INSTANCE_SUBNET=$(jq -c '.subnet' "$AKKA_BACKEND_SETTINGS")
@@ -68,10 +70,12 @@ do
     --user-data "file://user-data.sh" \
     --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${AKKA_BACKEND_INSTANCE_SUBNET_ID}" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=backend}]"
+  set +x # Disables the previous `set -x`
 done
 
 for AKKA_HTTP_SETTINGS in $(jq -c '.akka_backend_instances' "$EC2_SETTINGS")
 do
+  set -x # Enables a mode of the shell where all executed commands are printed to the termina
   AKKA_HTTP_INSTANCE_TYPE=$(jq -c '.instance_type' "$AKKA_HTTP_SETTINGS")
   AKKA_HTTP_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$AKKA_HTTP_SETTINGS")
   AKKA_HTTP_INSTANCE_SUBNET=$(jq -c '.subnet' "$AKKA_HTTP_SETTINGS")
@@ -85,4 +89,5 @@ do
     --user-data "file://user-data.sh" \
     --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${AKKA_HTTP_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${AKKA_HTTP_INSTANCE_SUBNET_ID}" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
+  set +x # Disables the previous `set -x`
 done
