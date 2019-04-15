@@ -95,3 +95,4 @@ do
     --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
   set +x # Disables the previous `set -x`
 done
+
