@@ -57,7 +57,7 @@ aws ec2 run-instances \
 set +x # Disables the previous `set -x`
 
 echo "Creating the Akka backend EC2 instances"
-for AKKA_BACKEND_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances')
+for AKKA_BACKEND_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances[]')
 do
   set -x # Enables a mode of the shell where all executed commands are printed to the termina
   AKKA_BACKEND_INSTANCE_TYPE=$(echo "$AKKA_BACKEND_SETTINGS" | jq -r '.instance_type')
@@ -77,7 +77,7 @@ do
 done
 
 echo "Creating the Akka http EC2 instances"
-for AKKA_HTTP_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances')
+for AKKA_HTTP_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances[]')
 do
   AKKA_HTTP_INSTANCE_TYPE=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.instance_type')
   AKKA_HTTP_INSTANCE_IP_ADDRESS_V4=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.ip_address_v4')

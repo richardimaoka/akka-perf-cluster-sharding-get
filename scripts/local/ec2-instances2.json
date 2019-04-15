@@ -15,13 +15,13 @@
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
       "ip_address_v4": "10.0.0.17",
-      "seed_node": true
+      "seed_node": false
     },
     {
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
       "ip_address_v4": "10.0.0.18",
-      "seed_node": true
+      "seed_node": false
     }
   ],
   "akka_http_instances": [
