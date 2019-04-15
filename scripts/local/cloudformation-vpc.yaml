@@ -42,14 +42,6 @@ Resources:
       Tags:
         - Key: Name
           Value: aws-wrk-athena-vpc
-  Subnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      CidrBlock: 10.0.0.0/16
-      VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-subnet"
 
   # Define Internet Gateway and the attachment to VPC
   InternetGateway:
@@ -63,6 +55,44 @@ Resources:
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
+
+  # Subnets for all the Availability Zones of the region
+  SubnetAz1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/24
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-northeast-1a
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-subnet-1a"
+  SubnetAz1a2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-northeast-1a
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-subnet-1a2"
+  SubnetAz1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.3.0/24
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-northeast-1c
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-subnet-1c"
+  SubnetAz1d:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.2.0/24
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-northeast-1d
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-subnet-1d"
 
   # Define Route Table, its Route, and associate the Route Table with the Subnet
   RouteTable:
@@ -78,11 +108,26 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
       RouteTableId: !Ref RouteTable
-  SubnetRouteTableAssociation:
+  SubnetAz1aRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref RouteTable
-      SubnetId: !Ref Subnet
+      SubnetId: !Ref SubnetAz1a
+  SubnetAz1a2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetAz1a2
+  SubnetAz1cRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetAz1c
+  SubnetAz1dRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetAz1d
 
   # Define Security Group and its inbound rules (= ingress).
   # The outbound (egress) rules are automatically set as "Allow All".
@@ -129,8 +174,24 @@ Outputs:
     Value: !Ref SecurityGroup
     Export:
       Name: !Sub "${AWS::StackName}-SecurityGroup"
-  Subnet:
-    Description: Subnet
-    Value: !Ref Subnet
+  SubnetAz1a:
+    Description: Subnet for Availability Zone ap-northeast-1a
+    Value: !Ref SubnetAz1a
     Export:
-      Name: !Sub "${AWS::StackName}-Subnet"
+      Name: !Sub "${AWS::StackName}-SubnetAz1a"
+  SubnetAz1a2:
+    Description: Another Subnet for Availability Zone ap-northeast-1a
+    Value: !Ref SubnetAz1a2
+    Export:
+      Name: !Sub "${AWS::StackName}-SubnetAz1a2"
+  SubnetAz1c:
+    Description: Subnet for Availability Zone ap-northeast-1c
+    Value: !Ref SubnetAz1c
+    Export:
+      Name: !Sub "${AWS::StackName}-SubnetAz1c"
+  SubnetAz1d:
+    Description: Subnet for Availability Zone ap-northeast-1d
+    Value: !Ref SubnetAz1d
+    Export:
+      Name: !Sub "${AWS::StackName}-SubnetAz1d"
+
