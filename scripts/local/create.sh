@@ -1,9 +1,12 @@
 #!/bin/sh
 
-if [ -f "$1" ]; then
+if [ "$1" = "" ]; then
+  CURRENT_DIR=$(dirname "$0")
+  EC2_SETTINGS=$(cat "$CURRENT_DIR"/ec2-instances.json)
+elif [ -f "$1" ]; then
   EC2_SETTINGS=$(cat "$1")
 else
-  echo "$1 is not a file"
+  echo "The parameter = '$1' is not a file"
   exit 1
 fi
 
@@ -16,6 +19,14 @@ set -e
 # Create a Cloudformation stack from the local template `cloudformation-vpc.yaml`
 VPC_STACK_NAME="bench-vpc"
 SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
+
+
+CMD="aws cloudformation create-stack" \
+  "--stack-name ${VPC_STACK_NAME}" \
+  "--template-body file://cloudformation-vpc.yaml" \
+  "--capabilities CAPABILITY_NAMED_IAM" \
+  "--parameters ParameterKey=SSHLocation,ParameterValue=${SSH_LOCATION}"
+echo "running:\n${CMD}"
 
 aws cloudformation create-stack \
   --stack-name "${VPC_STACK_NAME}" \
