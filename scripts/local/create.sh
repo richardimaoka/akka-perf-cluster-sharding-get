@@ -32,8 +32,8 @@ set +x # Disables the previous `set -x`
 
 # Variables to be passed upon EC2 creation in the next step
 DESCRIBED=$(aws cloudformation describe-stacks --stack-name "${VPC_STACK_NAME}")
-SECURITY_GROUP=$("${DESCRIBED}" | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "SecurityGroup") | .OutputValue')
-IAM_INSTANCE_PROFILE_SSM=$("${DESCRIBED}" | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "InstanceProfile") | .OutputValue')
+SECURITY_GROUP=$(echo "${DESCRIBED}" | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "SecurityGroup") | .OutputValue')
+IAM_INSTANCE_PROFILE_SSM=$(echo "${DESCRIBED}" | jq -c '.Stacks[0].Outputs[] | select(.OutputKey == "InstanceProfile") | .OutputValue')
 
 # Create EC2 instances. Since CloudFormation doesn't support creation of a variable number of EC2 instances,
 # you need to create the instances via CLI.
@@ -41,7 +41,7 @@ WRK_INSTANCE_SETTINGS=$(jq -c '.wrk_instance' "$EC2_SETTINGS")
 WRK_INSTANCE_TYPE=$(jq -c '.instance_type' "$WRK_INSTANCE_SETTINGS")
 WRK_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$WRK_INSTANCE_SETTINGS")
 WRK_INSTANCE_SUBNET=$(jq -c '.subnet' "$WRK_INSTANCE_SETTINGS")
-WRK_INSTANCE_SUBNET_ID=$("${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${WRK_INSTANCE_SUBNET}) | .OutputValue")
+WRK_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${WRK_INSTANCE_SUBNET}) | .OutputValue")
 # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
 set -x # Enables a mode of the shell where all executed commands are printed to the termina
 aws ec2 run-instances \
@@ -60,7 +60,7 @@ do
   AKKA_BACKEND_INSTANCE_TYPE=$(jq -c '.instance_type' "$AKKA_BACKEND_SETTINGS")
   AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$AKKA_BACKEND_SETTINGS")
   AKKA_BACKEND_INSTANCE_SUBNET=$(jq -c '.subnet' "$AKKA_BACKEND_SETTINGS")
-  AKKA_BACKEND_INSTANCE_SUBNET_ID=$("${DESCRIBED}"  | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${AKKA_BACKEND_INSTANCE_SUBNET}) | .OutputValue")
+  AKKA_BACKEND_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${AKKA_BACKEND_INSTANCE_SUBNET}) | .OutputValue")
   # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
   aws ec2 run-instances \
     --image-id "ami-0d7ed3ddb85b521a6" \
@@ -79,7 +79,7 @@ do
   AKKA_HTTP_INSTANCE_TYPE=$(jq -c '.instance_type' "$AKKA_HTTP_SETTINGS")
   AKKA_HTTP_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$AKKA_HTTP_SETTINGS")
   AKKA_HTTP_INSTANCE_SUBNET=$(jq -c '.subnet' "$AKKA_HTTP_SETTINGS")
-  AKKA_HTTP_INSTANCE_SUBNET_ID=$("${DESCRIBED}"  | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${AKKA_HTTP_INSTANCE_SUBNET}) | .OutputValue")
+  AKKA_HTTP_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}"  | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == ${AKKA_HTTP_INSTANCE_SUBNET}) | .OutputValue")
   # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
   aws ec2 run-instances \
     --image-id "ami-0d7ed3ddb85b521a6" \
