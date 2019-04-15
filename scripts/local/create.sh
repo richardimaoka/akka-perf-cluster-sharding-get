@@ -20,12 +20,13 @@ set -e
 VPC_STACK_NAME="bench-vpc"
 SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
 
+echo "Creating the VPC"
 set -x # Enables a mode of the shell where all executed commands are printed to the termina
-aws cloudformation create-stack \
-  --stack-name "${VPC_STACK_NAME}" \
-  --template-body file://cloudformation-vpc.yaml \
-  --capabilities CAPABILITY_NAMED_IAM \
-  --parameters ParameterKey=SSHLocation,ParameterValue="${SSH_LOCATION}"
+# aws cloudformation create-stack \
+#   --stack-name "${VPC_STACK_NAME}" \
+#   --template-body file://cloudformation-vpc.yaml \
+#   --capabilities CAPABILITY_NAMED_IAM \
+#   --parameters ParameterKey=SSHLocation,ParameterValue="${SSH_LOCATION}"
 
 aws cloudformation wait stack-create-complete --stack-name "${VPC_STACK_NAME}"
 set +x # Disables the previous `set -x`
@@ -37,7 +38,8 @@ IAM_INSTANCE_PROFILE_SSM=$(echo "${DESCRIBED}" | jq -c '.Stacks[0].Outputs[] | s
 
 # Create EC2 instances. Since CloudFormation doesn't support creation of a variable number of EC2 instances,
 # you need to create the instances via CLI.
-WRK_INSTANCE_SETTINGS=$(jq -c '.wrk_instance' "$EC2_SETTINGS")
+echo "Creating the WRK EC2 instance"
+WRK_INSTANCE_SETTINGS=$(echo "$EC2_SETTINGS" | jq -c '.wrk_instance')
 WRK_INSTANCE_TYPE=$(jq -c '.instance_type' "$WRK_INSTANCE_SETTINGS")
 WRK_INSTANCE_IP_ADDRESS_V4=$(jq -c '.ip_address_v4' "$WRK_INSTANCE_SETTINGS")
 WRK_INSTANCE_SUBNET=$(jq -c '.subnet' "$WRK_INSTANCE_SETTINGS")
@@ -54,7 +56,8 @@ aws ec2 run-instances \
   --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
 set +x # Disables the previous `set -x`
 
-for AKKA_BACKEND_SETTINGS in $(jq -c '.akka_backend_instances' "$EC2_SETTINGS")
+echo "Creating the Akka backend EC2 instances"
+for AKKA_BACKEND_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances')
 do
   set -x # Enables a mode of the shell where all executed commands are printed to the termina
   AKKA_BACKEND_INSTANCE_TYPE=$(jq -c '.instance_type' "$AKKA_BACKEND_SETTINGS")
@@ -73,7 +76,8 @@ do
   set +x # Disables the previous `set -x`
 done
 
-for AKKA_HTTP_SETTINGS in $(jq -c '.akka_backend_instances' "$EC2_SETTINGS")
+echo "Creating the Akka http EC2 instances"
+for AKKA_HTTP_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances')
 do
   set -x # Enables a mode of the shell where all executed commands are printed to the termina
   AKKA_HTTP_INSTANCE_TYPE=$(jq -c '.instance_type' "$AKKA_HTTP_SETTINGS")
