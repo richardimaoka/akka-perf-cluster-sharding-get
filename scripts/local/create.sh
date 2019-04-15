@@ -42,7 +42,7 @@ echo "Creating the WRK EC2 instance"
 WRK_INSTANCE_SETTINGS=$(echo "$EC2_SETTINGS" | jq -c '.wrk_instance')
 WRK_INSTANCE_TYPE=$(echo "$WRK_INSTANCE_SETTINGS" | jq -r '.instance_type')
 WRK_INSTANCE_IP_ADDRESS_V4=$(echo "$WRK_INSTANCE_SETTINGS" | jq -r '.ip_address_v4')
-WRK_INSTANCE_SUBNET=$(echo "$WRK_INSTANCE_SETTINGS" | jq -r '.subnet')
+WRK_INSTANCE_SUBNET=$(echo "$WRK_INSTANCE_SETTINGS" | jq -c '.subnet')
 WRK_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == $WRK_INSTANCE_SUBNET) | .OutputValue")
 # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
 set -x # Enables a mode of the shell where all executed commands are printed to the terminal
@@ -62,7 +62,7 @@ do
   set -x # Enables a mode of the shell where all executed commands are printed to the termina
   AKKA_BACKEND_INSTANCE_TYPE=$(echo "$AKKA_BACKEND_SETTINGS" | jq -r '.instance_type')
   AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4=$(echo "$AKKA_BACKEND_SETTINGS" | jq -r '.ip_address_v4')
-  AKKA_BACKEND_INSTANCE_SUBNET=$(echo "$AKKA_BACKEND_SETTINGS" | jq -r '.subnet')
+  AKKA_BACKEND_INSTANCE_SUBNET=$(echo "$AKKA_BACKEND_SETTINGS" | jq -c '.subnet')
   AKKA_BACKEND_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == $AKKA_BACKEND_INSTANCE_SUBNET) | .OutputValue")
   # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
   aws ec2 run-instances \
@@ -82,7 +82,7 @@ do
   set -x # Enables a mode of the shell where all executed commands are printed to the terminal
   AKKA_HTTP_INSTANCE_TYPE=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.instance_type')
   AKKA_HTTP_INSTANCE_IP_ADDRESS_V4=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.ip_address_v4')
-  AKKA_HTTP_INSTANCE_SUBNET=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.subnet')
+  AKKA_HTTP_INSTANCE_SUBNET=$(echo "$AKKA_HTTP_SETTINGS" | jq -c '.subnet')
   AKKA_HTTP_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == $AKKA_HTTP_INSTANCE_SUBNET) | .OutputValue")
   # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
   aws ec2 run-instances \
