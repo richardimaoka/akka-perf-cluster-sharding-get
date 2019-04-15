@@ -15,18 +15,12 @@ cd "$(dirname "$0")"
 
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
+# Enables a mode of the shell where all executed commands are printed to the termina
+set -x
 
 # Create a Cloudformation stack from the local template `cloudformation-vpc.yaml`
 VPC_STACK_NAME="bench-vpc"
 SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
-
-
-CMD="aws cloudformation create-stack" \
-  "--stack-name ${VPC_STACK_NAME}" \
-  "--template-body file://cloudformation-vpc.yaml" \
-  "--capabilities CAPABILITY_NAMED_IAM" \
-  "--parameters ParameterKey=SSHLocation,ParameterValue=${SSH_LOCATION}"
-echo "running:\n${CMD}"
 
 aws cloudformation create-stack \
   --stack-name "${VPC_STACK_NAME}" \
