@@ -79,11 +79,11 @@ done
 echo "Creating the Akka http EC2 instances"
 for AKKA_HTTP_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_backend_instances')
 do
-  set -x # Enables a mode of the shell where all executed commands are printed to the terminal
   AKKA_HTTP_INSTANCE_TYPE=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.instance_type')
   AKKA_HTTP_INSTANCE_IP_ADDRESS_V4=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.ip_address_v4')
   AKKA_HTTP_INSTANCE_SUBNET=$(echo "$AKKA_HTTP_SETTINGS" | jq -c '.subnet')
   AKKA_HTTP_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == $AKKA_HTTP_INSTANCE_SUBNET) | .OutputValue")
+  set -x # Enables a mode of the shell where all executed commands are printed to the terminal
   # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
   aws ec2 run-instances \
     --image-id "ami-0d7ed3ddb85b521a6" \

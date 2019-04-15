@@ -16,7 +16,7 @@
     {
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
-      "ip_address_v4": "10.0.0.6"
+      "ip_address_v4": "10.0.0.7"
     }
   ]
 }
