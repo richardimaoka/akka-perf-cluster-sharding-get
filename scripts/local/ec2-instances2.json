@@ -22,7 +22,7 @@
       "subnet": "SubnetAz1a",
       "ip_address_v4": "10.0.0.18",
       "seed_node": true
-    },
+    }
   ],
   "akka_http_instances": [
     {
