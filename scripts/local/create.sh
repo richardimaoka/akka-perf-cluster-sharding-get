@@ -51,7 +51,7 @@ aws ec2 run-instances \
   --instance-type "${WRK_INSTANCE_TYPE}" \
   --key-name "demo-key-pair" \
   --iam-instance-profile "Name=${IAM_INSTANCE_PROFILE_SSM}" \
-  - -user-data "file://user-data.sh" \
+  --user-data "file://user-data.sh" \
   --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${WRK_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${WRK_INSTANCE_SUBNET_ID}" \
   --tag-specifications "ResourceType=instance,Tags=[{Key=role,Value=wrk}]"
 set +x # Disables the previous `set -x`
