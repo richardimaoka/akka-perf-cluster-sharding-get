@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$1" = "" ]; then
+if [ -n "$1" ]; then
   EXEC_UUID="$1"
 else
   echo "The first parameter = '$1' is empty but must be passed!"
