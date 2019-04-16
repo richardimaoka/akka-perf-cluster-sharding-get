@@ -7,7 +7,7 @@ else
   exit 1
 fi
 
-if [ "$2" = "" ]; then
+if [ -n "$2" ]; then
   CURRENT_DIR=$(dirname "$0")
   EC2_SETTINGS=$(cat "$CURRENT_DIR"/ec2-instances.json)
 elif [ -f "$2" ]; then

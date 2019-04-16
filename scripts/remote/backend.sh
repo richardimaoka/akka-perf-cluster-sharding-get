@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$1" = "" ]; then
+if [ -n "$1" ]; then
   SEED_NODE_IPV4="$1"
 else
   echo "The parameter = '$1' was empty but should be provided"
