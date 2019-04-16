@@ -4,7 +4,7 @@ FROM czerasz/wrk-json:latest
 
 WORKDIR /app
 
-COPY scripts/remote scripts/remote
+COPY scripts scripts
 
 ENTRYPOINT ["scripts/remote/wrk-client.sh"]
 

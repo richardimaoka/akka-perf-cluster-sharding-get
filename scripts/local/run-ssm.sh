@@ -30,7 +30,7 @@ do
   aws ssm send-command \
     --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
-    --comment "running akka backend for benchmarking" \
+    --comment "running akka backend for benchmarking for exec id = ${EXEC_UUID}" \
     --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/backend.sh ${SEED_NODE_IPV4} ]" \
     --output text \
     --query "Command.CommandId"
@@ -42,7 +42,7 @@ do
   aws ssm send-command \
     --instance-ids "${AKKA_FRONTEND_INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
-    --comment "running akka frontend for benchmarking" \
+    --comment "running akka frontend for benchmarking for exec id = ${EXEC_UUID}" \
     --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/frontend.sh ${SEED_NODE_IPV4} ]" \
     --output text \
     --query "Command.CommandId"
