@@ -36,7 +36,7 @@ do
     --query "Command.CommandId"
 done
 
-for AKKA_FRONTEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+for AKKA_FRONTEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=frontend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_FRONTEND_INSTANCE_ID}"
   aws ssm send-command \
