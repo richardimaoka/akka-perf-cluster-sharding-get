@@ -24,7 +24,7 @@ cd "$(dirname "$0")"
 set -e
 
 SEED_NODE_IPV4=$(echo "$EC2_SETTINGS" | jq -r ".akka_backend_instances[] | select(.seed_node == true) | .ip_address_v4")
-AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_ID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 for AKKA_BACKEND_INSTANCE_ID in "${AKKA_BACKEND_INSTANCE_IDS}"
 do
   set -x # Enables a mode of the shell where all executed commands are printed to the terminal
@@ -39,7 +39,7 @@ do
   set +x # Disables the previous `set -x`
 done
 
-AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend"  "Name=tag:exec-id,Values=${EXEC_ID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 for AKKA_BACKEND_INSTANCE_ID in "${AKKA_BACKEND_INSTANCE_IDS}"
 do
   set -x # Enables a mode of the shell where all executed commands are printed to the terminal
