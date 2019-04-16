@@ -12,7 +12,7 @@
       "seed_node": true
     }
   ],
-  "akka_http_instances": [
+  "akka_frontend_instances": [
     {
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
