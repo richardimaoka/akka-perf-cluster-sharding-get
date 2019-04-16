@@ -54,7 +54,7 @@ aws ec2 run-instances \
   --iam-instance-profile "Name=${IAM_INSTANCE_PROFILE_SSM}" \
   --user-data "file://user-data.sh" \
   --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${WRK_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${WRK_INSTANCE_SUBNET_ID}" \
-  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=wrk,{Key=role,Value=wrk},{Key=exec-id,Value=${EXEC_UUID}}]"
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=wrk},{Key=role,Value=wrk},{Key=exec-id,Value=${EXEC_UUID}}]"
 set +x # Disables the previous `set -x`
 
 echo "Creating the Akka backend EC2 instances"
@@ -73,7 +73,7 @@ do
     --iam-instance-profile "Name=${IAM_INSTANCE_PROFILE_SSM}" \
     --user-data "file://user-data.sh" \
     --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${AKKA_BACKEND_INSTANCE_SUBNET_ID}" \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=akka-backend-${AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4},{Key=role,Value=backend},{Key=exec-id,Value=${EXEC_UUID}}]"
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=akka-backend-${AKKA_BACKEND_INSTANCE_IP_ADDRESS_V4}},{Key=role,Value=backend},{Key=exec-id,Value=${EXEC_UUID}}]"
   set +x # Disables the previous `set -x`
 done
 
@@ -93,7 +93,7 @@ do
     --iam-instance-profile "Name=${IAM_INSTANCE_PROFILE_SSM}" \
     --user-data "file://user-data.sh" \
     --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${AKKA_FRONTEND_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${AKKA_FRONTEND_INSTANCE_SUBNET_ID}" \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=akka-frontend-${AKKA_FRONTEND_INSTANCE_IP_ADDRESS_V4},{Key=role,Value=frontend}],{Key=exec-id,Value=${EXEC_UUID}}"
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=akka-frontend-${AKKA_FRONTEND_INSTANCE_IP_ADDRESS_V4}},{Key=role,Value=frontend},{Key=exec-id,Value=${EXEC_UUID}}]"
   set +x # Disables the previous `set -x`
 done
 
