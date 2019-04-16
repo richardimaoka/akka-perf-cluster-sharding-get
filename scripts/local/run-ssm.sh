@@ -27,7 +27,6 @@ SEED_NODE_IPV4=$(echo "$EC2_SETTINGS" | jq -r ".akka_backend_instances[] | selec
 AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 for AKKA_BACKEND_INSTANCE_ID in "${AKKA_BACKEND_INSTANCE_IDS}"
 do
-  set -x # Enables a mode of the shell where all executed commands are printed to the terminal
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
   aws ssm send-command \
     --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
@@ -36,13 +35,11 @@ do
     --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/backend.sh ${SEED_NODE_IPV4} ]" \
     --output text \
     --query "Command.CommandId"
-  set +x # Disables the previous `set -x`
 done
 
 AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 for AKKA_BACKEND_INSTANCE_ID in "${AKKA_BACKEND_INSTANCE_IDS}"
 do
-  set -x # Enables a mode of the shell where all executed commands are printed to the terminal
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
   aws ssm send-command \
     --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
@@ -51,5 +48,4 @@ do
     --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/backend.sh ${SEED_NODE_IPV4} ]" \
     --output text \
     --query "Command.CommandId"
-  set +x # Disables the previous `set -x`
 done
