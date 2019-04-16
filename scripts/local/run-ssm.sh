@@ -24,8 +24,7 @@ cd "$(dirname "$0")"
 set -e
 
 SEED_NODE_IPV4=$(echo "$EC2_SETTINGS" | jq -r ".akka_backend_instances[] | select(.seed_node == true) | .ip_address_v4")
-AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
-for AKKA_BACKEND_INSTANCE_ID in "${AKKA_BACKEND_INSTANCE_IDS}"
+for AKKA_BACKEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
   aws ssm send-command \
@@ -37,15 +36,14 @@ do
     --query "Command.CommandId"
 done
 
-AKKA_BACKEND_INSTANCE_IDS=$(aws ec2 describe-instances --filters "Name=tag:role,Values=backend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
-for AKKA_BACKEND_INSTANCE_ID in "${AKKA_BACKEND_INSTANCE_IDS}"
+for AKKA_FRONTEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
-  aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
+  aws ec2 wait instance-status-ok --instance-ids "${AKKA_FRONTEND_INSTANCE_ID}"
   aws ssm send-command \
-    --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
+    --instance-ids "${AKKA_FRONTEND_INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
-    --comment "running akka backend for benchmarking" \
-    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/backend.sh ${SEED_NODE_IPV4} ]" \
+    --comment "running akka frontend for benchmarking" \
+    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/frontend.sh ${SEED_NODE_IPV4} ]" \
     --output text \
     --query "Command.CommandId"
 done
