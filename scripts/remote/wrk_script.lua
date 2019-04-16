@@ -43,8 +43,6 @@ for i=1, #request_data do
   requests[i] = wrk.format(
     request_data[i].method,
     request_data[i].path
-    -- request_data[i].headers,
-    -- request_data[i].body
   )
 end
 
@@ -61,5 +59,5 @@ request = function()
   end
 
   -- Return the request object with the current URL path
-  return requests[i]
+  return requests[counter]
 end
