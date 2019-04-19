@@ -47,3 +47,16 @@ do
     --output text \
     --query "Command.CommandId"
 done
+
+FRONTEND_IPV4=$(echo "$EC2_SETTINGS" | jq -r ".akka_frontend_instances[0].ip_address_v4")
+for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=frontend"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+do
+  aws ec2 wait instance-status-ok --instance-ids "${AKKA_WRK_INSTANCE_ID}"
+  aws ssm send-command \
+    --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
+    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/wrk-client.sh ${FRONTEND_IPV4}:8080 ]" \
+    --output text \
+    --query "Command.CommandId"
+done
