@@ -5,8 +5,6 @@ import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import com.typesafe.config.ConfigFactory
 import richard.backend.actor.IdActor
 
-import scala.io.Source
-
 object Backend {
   def main(args: Array[String]): Unit = {
     val config = ConfigFactory.load("backend.conf")
@@ -19,13 +17,6 @@ object Backend {
       extractEntityId = IdActor.extractEntityId,
       extractShardId = IdActor.extractShardId
     )
-
-    val source = Source.fromFile("data/uuids.json")
-    val lines = source.getLines()
-    lines.foreach { uuid =>
-      shardRegion ! IdActor.Create(uuid)
-    }
-    source.close()
 
     if(scala.io.StdIn.readLine() != null)
       system.terminate()

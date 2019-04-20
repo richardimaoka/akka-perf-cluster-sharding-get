@@ -13,7 +13,7 @@ object CreateShardingActors {
       if(args.length > 0 && args(0).isInstanceOf[Int]) args(0).asInstanceOf[Int]
       else 100
 
-    val config = ConfigFactory.load("backend.conf")
+    val config = ConfigFactory.load("create-sharding-actors.conf")
     val system = ActorSystem(config.getString("actor-system-name"), config)
 
     val shardRegion = ClusterSharding(system).start(

@@ -6,5 +6,5 @@ WORKDIR /app
 
 COPY scripts scripts
 
-ENTRYPOINT ["scripts/remote/wrk-client.sh", "-s scripts/remote/wrk_script.lua"]
+ENTRYPOINT ["scripts/remote/wrk-client.sh", "-s scripts/remote/wrk_custom_request.lua"]
 
