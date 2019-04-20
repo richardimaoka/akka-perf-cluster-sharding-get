@@ -1,48 +1,22 @@
--- http://czerasz.com/2015/07/19/wrk-http-benchmarking-tool-example/
+-- https://stackoverflow.com/questions/11201262/how-to-read-data-from-a-file-in-lua
 
--- Module instantiation
-local cjson = require "cjson"
-local cjson2 = cjson.new()
-local cjson_safe = require "cjson.safe"
-
--- Load URL paths from the file
-function load_request_objects_from_file(file)
-  local content
-
-  -- Check if the file exists
-  -- Resource: http://stackoverflow.com/a/4991602/325852
-  local f=io.open(file,"r")
-  if f~=nil then
-    content = f:read("*all")
-
-    io.close(f)
-  else
-    -- Return the empty array
-    return lines
+-- get all lines from a file, returns an empty
+-- list/table if the file does not exist
+function lines_from(file)
+  if not file_exists(file) then return {} end
+  lines = {}
+  for line in io.lines(file) do
+    lines[#lines + 1] = line
   end
-
-  -- Translate Lua value to/from JSON
-  local data = cjson.decode(content)
-
-  return data
+  return lines
 end
 
--- Load URL requests from file
-request_data = load_request_objects_from_file("requests.json")
-
--- Check if at least one path was found in the file
-if #request_data <= 0 then
-  print("No requests found in the file.")
-  os.exit()
-end
-
-print("multiple requests: Found " .. #request_data .. " request_data")
-
+local lines = lines_from("../../data/uuids.txt")
 requests = {}
-for i=1, #request_data do
+for i=1, #lines do
   requests[i] = wrk.format(
-    request_data[i].method,
-    request_data[i].path
+    "GET",
+    lines[i]
   )
 end
 

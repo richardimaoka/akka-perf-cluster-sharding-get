@@ -11,15 +11,9 @@ fi
 cd "$(dirname "$0")" || exit
 
 # Populate the uuids.json file
-echo "[" > ../../data/uuids.json
+echo "" > ../../data/uuids.json
 
 for i in $(seq 1 "$NUM_UUIDS")
 do
-  if [ "$i" -lt "$NUM_UUIDS" ]; then
-    echo "\"$(uuidgen)\"," >> ../../data/uuids.json
-  else
-    echo "\"$(uuidgen)\"" >> ../../data/uuids.json
-  fi
+  echo "$(uuidgen)" >> ../../data/uuids.txt
 done
-
-echo "]" >> ../../data/uuids.json
