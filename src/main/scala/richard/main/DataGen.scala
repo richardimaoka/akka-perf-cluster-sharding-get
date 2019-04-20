@@ -5,7 +5,7 @@ import java.util.UUID
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import richard.frontend.perf.WrkHttpRequest
+import richard.http.perf.WrkHttpRequest
 
 object DataGen {
   def main(args: Array[String]): Unit = {

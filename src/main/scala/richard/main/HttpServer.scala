@@ -4,13 +4,13 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import richard.frontend.routes.IdRoute
+import richard.http.routes.IdRoute
 
 import scala.io.Source
 
-object Frontend {
+object HttpServer {
   def main(args: Array[String]): Unit = {
-    val config = ConfigFactory.load("frontend.conf")
+    val config = ConfigFactory.load("http.conf")
 
     implicit val system = ActorSystem(config.getString("actor-system-name"), config)
     implicit val materializer = ActorMaterializer()

@@ -72,19 +72,19 @@ do
 done
 
 echo "Creating the Akka http EC2 instances"
-for AKKA_FRONTEND_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_frontend_instances[]')
+for AKKA_HTTP_SETTINGS in $(echo "$EC2_SETTINGS" | jq -c '.akka_http_instances[]')
 do
-  AKKA_FRONTEND_INSTANCE_TYPE=$(echo "$AKKA_FRONTEND_SETTINGS" | jq -r '.instance_type')
-  AKKA_FRONTEND_INSTANCE_IP_ADDRESS_V4=$(echo "$AKKA_FRONTEND_SETTINGS" | jq -r '.ip_address_v4')
-  AKKA_FRONTEND_INSTANCE_SUBNET=$(echo "$AKKA_FRONTEND_SETTINGS" | jq -c '.subnet')
-  AKKA_FRONTEND_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == $AKKA_FRONTEND_INSTANCE_SUBNET) | .OutputValue")
+  AKKA_HTTP_INSTANCE_TYPE=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.instance_type')
+  AKKA_HTTP_INSTANCE_IP_ADDRESS_V4=$(echo "$AKKA_HTTP_SETTINGS" | jq -r '.ip_address_v4')
+  AKKA_HTTP_INSTANCE_SUBNET=$(echo "$AKKA_HTTP_SETTINGS" | jq -c '.subnet')
+  AKKA_HTTP_INSTANCE_SUBNET_ID=$(echo "${DESCRIBED}" | jq -c ".Stacks[0].Outputs[] | select(.OutputKey == $AKKA_HTTP_INSTANCE_SUBNET) | .OutputValue")
   # If you are using a command line tool, base64-encoding is performed for you, and you can load the text from a file., https://docs.aws.amazon.com/cli/latest/reference/ec2/run-instances.html
   aws ec2 run-instances \
     --image-id "ami-0d7ed3ddb85b521a6" \
-    --instance-type "${AKKA_FRONTEND_INSTANCE_TYPE}"  \
+    --instance-type "${AKKA_HTTP_INSTANCE_TYPE}"  \
     --key-name "demo-key-pair" \
     --iam-instance-profile "Name=${IAM_INSTANCE_PROFILE_SSM}" \
     --user-data "file://user-data.sh" \
-    --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${AKKA_FRONTEND_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${AKKA_FRONTEND_INSTANCE_SUBNET_ID}" \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=akka-frontend-${AKKA_FRONTEND_INSTANCE_IP_ADDRESS_V4}},{Key=role,Value=frontend},{Key=exec-id,Value=${EXEC_UUID}}]"
+    --network-interfaces "AssociatePublicIpAddress=true,DeviceIndex=0,PrivateIpAddress=${AKKA_HTTP_INSTANCE_IP_ADDRESS_V4},Groups=${SECURITY_GROUP},SubnetId=${AKKA_HTTP_INSTANCE_SUBNET_ID}" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=akka-http-${AKKA_HTTP_INSTANCE_IP_ADDRESS_V4}},{Key=role,Value=http},{Key=exec-id,Value=${EXEC_UUID}}]"
 done

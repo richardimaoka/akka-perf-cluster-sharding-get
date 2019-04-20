@@ -1,4 +1,4 @@
-package richard.frontend.routes
+package richard.http.routes
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.cluster.sharding.ClusterSharding

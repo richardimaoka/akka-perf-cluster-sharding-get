@@ -15,4 +15,4 @@ docker run \
   -e AKKA_CLUSTER_SEED_NODE_PORT="2551" \
   -e HOST_AKKA_REMOTING_PORT="2551" \
   --network host \
-  -d richard-perf-frontend:latest
+  -d richard-perf-http:latest
