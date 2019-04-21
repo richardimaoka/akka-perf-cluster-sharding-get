@@ -70,9 +70,12 @@ do
 done
 
 echo "creating sharding actors"
-# Sending this to the last ${AKKA_BACKEND_INSTANCE_ID}
+# Use the wrk EC2 instance as other Akka backend/http instances might be short on memory
+# if instances <= t2.medium
+WRK_INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:role,Values=wrk"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+aws ec2 wait instance-status-ok --instance-ids "${WRK_INSTANCE_ID}"
 aws ssm send-command \
-  --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
+  --instance-ids "${WRK_INSTANCE_ID}" \
   --document-name "AWS-RunShellScript" \
   --comment "creating sharding actors for exec id = ${EXEC_UUID}" \
   --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/create-sharding-actors.sh ${SEED_NODE_IPV4} ]" \
@@ -96,14 +99,11 @@ echo "sleeping until everything is ready..."
 sleep 30
 
 echo "running wrk"
-for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=wrj"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
-do
-  aws ec2 wait instance-status-ok --instance-ids "${AKKA_WRK_INSTANCE_ID}"
-  aws ssm send-command \
-    --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
-    --document-name "AWS-RunShellScript" \
-    --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ docker run richard-perf-wrk:latest http://${AKKA_HTTP_IPV4}:8080 ]" \
-    --output text \
-    --query "Command.CommandId"
-done
+WRK_INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:role,Values=wrk"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+aws ssm send-command \
+  --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
+  --document-name "AWS-RunShellScript" \
+  --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
+  --parameters commands="[ docker run richard-perf-wrk:latest http://${AKKA_HTTP_IPV4}:8080 ]" \
+  --output text \
+  --query "Command.CommandId"
