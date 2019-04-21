@@ -16,7 +16,7 @@ object HttpServer {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
-    val source = Source.fromFile("data/uuids.json")
+    val source = Source.fromFile("data/uuids.txt")
     val uuids = source.getLines().toList
     source.close()
 

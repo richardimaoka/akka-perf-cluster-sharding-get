@@ -10,7 +10,7 @@ import richard.http.perf.WrkHttpRequest
 object DataGen {
   def main(args: Array[String]): Unit = {
     val wrkRequestFile = new File("data/requests.json")
-    val uuidFile = new File("data/uuids.json")
+    val uuidFile = new File("data/uuids.txt")
 
     val objectMapper = new ObjectMapper
     objectMapper.registerModule(DefaultScalaModule)
