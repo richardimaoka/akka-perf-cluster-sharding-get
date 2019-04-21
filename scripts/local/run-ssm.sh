@@ -56,6 +56,18 @@ if [ -n "${COMMAND_ERROR}" ]; then
   exit 1
 fi
 
+
+echo "starting the seed node"
+AKKA_SEED_NODE_INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:role,Values=seed-node"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+aws ec2 wait instance-status-ok --instance-ids "${AKKA_SEED_NODE_INSTANCE_ID}"
+aws ssm send-command \
+  --instance-ids "${AKKA_SEED_NODE_INSTANCE_ID}" \
+  --document-name "AWS-RunShellScript" \
+  --comment "creating sharding actors for exec id = ${EXEC_UUID}" \
+  --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/seed-node.sh ${SEED_NODE_IPV4} ]" \
+  --output text \
+  --query "Command.CommandId"
+
 echo "starting backend"
 for AKKA_BACKEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
