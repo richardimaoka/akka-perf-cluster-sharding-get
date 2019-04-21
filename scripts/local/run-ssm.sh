@@ -73,7 +73,7 @@ aws ssm send-command \
   --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
   --document-name "AWS-RunShellScript" \
   --comment "creating sharding actors for exec id = ${EXEC_UUID}" \
-  --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/richard-perf-create-sharding-actors.sh ${SEED_NODE_IPV4} ]" \
+  --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/create-sharding-actors.sh ${SEED_NODE_IPV4} ]" \
   --output text \
   --query "Command.CommandId"
 
@@ -96,7 +96,7 @@ do
     --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
     --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ dccker run richard-perf-wrk:latest ${HTTP_IPV4}:8080 ]" \
+    --parameters commands="[ docker run richard-perf-wrk:latest ${HTTP_IPV4}:8080 ]" \
     --output text \
     --query "Command.CommandId"
 done
