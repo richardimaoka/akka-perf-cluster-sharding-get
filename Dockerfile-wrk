@@ -1,12 +1,9 @@
-FROM czerasz/wrk-json:latest
-# This image is bit old and there's no versioning
-# However, I use it because I had troubles with installing cjson with williamyeh/wrk as I am not familiar with lua
+FROM williamyeh/wrk:latest
 
 WORKDIR /app
 
 COPY scripts scripts
 COPY data data
 
-CMD ["-t", "12", "-c", "400", "-d", "30s" ]
 ENTRYPOINT ["wrk", "-s scripts/remote/wrk_custom_request.lua"]
 
