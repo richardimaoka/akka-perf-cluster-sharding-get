@@ -11,7 +11,6 @@ set -e
 #  --akka-http-ipv4: The IPv4 address of the Akka HTTP server
 while [ $# -gt 0 ]
 do
-    echo "$1, $2"
     case "$1" in
         '--seed-node-ipv4' )
             if [ -z "$2" ] || [ $(echo "$2" | cut -c 1) = "-" ] ; then
@@ -19,7 +18,6 @@ do
                 exit 1
             fi
             SEED_NODE_IPV4="$2"
-            echo "Setting SEED_NODE_IPV4=${SEED_NODE_IPV4}"
             shift 2
             ;;
         '--akka-http-ipv4' )
@@ -28,7 +26,6 @@ do
                 exit 1
             fi
             AKKA_HTTP_IPV4="$2"
-            echo "Setting AKKA_HTTP_IPV4=${AKKA_HTTP_IPV4}"
             shift 2
             ;;
         -*)
@@ -38,7 +35,6 @@ do
         *)
             if [ -n "$1" ] ; then
                 EXEC_UUID="$1"
-                echo "Setting EXEC_UUID=${EXEC_UUID}"
                 break
             fi
             ;;
@@ -59,3 +55,48 @@ if [ -n "${COMMAND_ERROR}" ]; then
   echo "${COMMAND_ERROR}" 1>&2
   exit 1
 fi
+
+for AKKA_BACKEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+do
+  aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
+  aws ssm send-command \
+    --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --comment "running akka backend for benchmarking for exec id = ${EXEC_UUID}" \
+    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/backend.sh ${SEED_NODE_IPV4} ]" \
+    --output text \
+    --query "Command.CommandId"
+done
+
+# Sending this to the last ${AKKA_BACKEND_INSTANCE_ID}
+aws ssm send-command \
+  --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
+  --document-name "AWS-RunShellScript" \
+  --comment "creating sharding actors for exec id = ${EXEC_UUID}" \
+  --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/richard-perf-create-sharding-actors.sh ${SEED_NODE_IPV4} ]" \
+  --output text \
+  --query "Command.CommandId"
+
+for AKKA_HTTP_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+do
+  aws ec2 wait instance-status-ok --instance-ids "${AKKA_HTTP_INSTANCE_ID}"
+  aws ssm send-command \
+    --instance-ids "${AKKA_HTTP_INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --comment "running akka http for benchmarking for exec id = ${EXEC_UUID}" \
+    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/http.sh ${SEED_NODE_IPV4} ]" \
+    --output text \
+    --query "Command.CommandId"
+done
+
+for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+do
+  aws ec2 wait instance-status-ok --instance-ids "${AKKA_WRK_INSTANCE_ID}"
+  aws ssm send-command \
+    --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
+    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/wrk-client.sh ${HTTP_IPV4}:8080 ]" \
+    --output text \
+    --query "Command.CommandId"
+done
