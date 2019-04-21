@@ -31,7 +31,7 @@ object CreateShardingActors {
 
     implicit val timeout: Timeout = 1.second
     implicit val ec: ExecutionContext = system.dispatcher
-    val source = Source.fromFile("data/uuids.json")
+    val source = Source.fromFile("data/uuids.txt")
     for (uuid <- source.getLines()) {
       val asking = shardRegion ? IdActor.Create(uuid.toString)
       try {
