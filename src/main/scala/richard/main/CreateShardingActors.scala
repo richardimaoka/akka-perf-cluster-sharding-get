@@ -9,9 +9,8 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import richard.backend.actor.IdActor
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.concurrent.{Await, ExecutionContext}
 
 object CreateShardingActors {
   def main(args: Array[String]): Unit = {
@@ -34,13 +33,13 @@ object CreateShardingActors {
     implicit val ec: ExecutionContext = system.dispatcher
     for (_ <- 1 to numShardActors) {
       val uuid = UUID.randomUUID()
-      val ask = shardRegion ? IdActor.Create(uuid.toString)
+      val asking = shardRegion ? IdActor.Create(uuid.toString)
 
       try {
-        Await.result(ask.mapTo[String], 1.second)
+        Await.result(asking.mapTo[String], 1.second)
         println("Successfully created " + uuid)
       } catch {
-        case _ => println("Failed to create " + uuid)
+        case _: Throwable => println("Failed to create " + uuid)
       }
 
     }
