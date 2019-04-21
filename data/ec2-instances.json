@@ -1,5 +1,10 @@
 {
   "wrk_instance": {
+    "instance_type": "t2.small",
+    "subnet": "SubnetAz1a",
+    "ip_address_v4": "10.0.0.14"
+  },
+  "akka_seed_node_instance": {
     "instance_type": "t2.medium",
     "subnet": "SubnetAz1a",
     "ip_address_v4": "10.0.0.15"
@@ -8,20 +13,17 @@
     {
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
-      "ip_address_v4": "10.0.0.16",
-      "seed_node": true
+      "ip_address_v4": "10.0.0.16"
     },
     {
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
-      "ip_address_v4": "10.0.0.17",
-      "seed_node": false
+      "ip_address_v4": "10.0.0.17"
     },
     {
       "instance_type": "t2.medium",
       "subnet": "SubnetAz1a",
-      "ip_address_v4": "10.0.0.18",
-      "seed_node": false
+      "ip_address_v4": "10.0.0.18"
     }
   ],
   "akka_http_instances": [
