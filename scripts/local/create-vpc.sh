@@ -13,7 +13,7 @@ SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
 echo "Creating the VPC"
 aws cloudformation create-stack \
   --stack-name "${VPC_STACK_NAME}" \
-  --template-body file://../../cloudformation-vpc.yaml \
+  --template-body file://../../data/cloudformation-vpc.yaml \
   --capabilities CAPABILITY_NAMED_IAM \
   --parameters ParameterKey=SSHLocation,ParameterValue="${SSH_LOCATION}"
 
