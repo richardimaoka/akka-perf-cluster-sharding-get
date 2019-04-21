@@ -96,7 +96,7 @@ echo "sleeping until everything is ready..."
 sleep 30
 
 echo "running wrk"
-for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=wrj"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_WRK_INSTANCE_ID}"
   aws ssm send-command \
