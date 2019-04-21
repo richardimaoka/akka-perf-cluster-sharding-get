@@ -56,6 +56,7 @@ if [ -n "${COMMAND_ERROR}" ]; then
   exit 1
 fi
 
+echo "starting backend"
 for AKKA_BACKEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
@@ -68,6 +69,7 @@ do
     --query "Command.CommandId"
 done
 
+echo "creating sharding actors"
 # Sending this to the last ${AKKA_BACKEND_INSTANCE_ID}
 aws ssm send-command \
   --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
@@ -77,6 +79,7 @@ aws ssm send-command \
   --output text \
   --query "Command.CommandId"
 
+echo "starting http"
 for AKKA_HTTP_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_HTTP_INSTANCE_ID}"
@@ -89,6 +92,10 @@ do
     --query "Command.CommandId"
 done
 
+echo "sleeping until everything is ready..."
+sleep 30
+
+echo "running wrk"
 for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
   aws ec2 wait instance-status-ok --instance-ids "${AKKA_WRK_INSTANCE_ID}"
@@ -96,7 +103,7 @@ do
     --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
     --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ docker run richard-perf-wrk:latest ${HTTP_IPV4}:8080 ]" \
+    --parameters commands="[ docker run richard-perf-wrk:latest http://${HTTP_IPV4}:8080 ]" \
     --output text \
     --query "Command.CommandId"
 done
