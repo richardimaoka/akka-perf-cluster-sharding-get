@@ -96,12 +96,12 @@ do
 done
 
 echo "sleeping until everything is ready..."
-sleep 30
+sleep 60
 
 echo "running wrk"
 WRK_INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:role,Values=wrk"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 aws ssm send-command \
-  --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
+  --instance-ids "${WRK_INSTANCE_ID}" \
   --document-name "AWS-RunShellScript" \
   --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
   --parameters commands="[ docker run richard-perf-wrk:latest http://${AKKA_HTTP_IPV4}:8080 ]" \
