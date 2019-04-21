@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$1" = "" ]; then
+if [ -z "$1" ]; then
   CURRENT_DIR=$(dirname "$0")
   EC2_SETTINGS=$(cat "$CURRENT_DIR"/ec2-instances.json)
 elif [ -f "$1" ]; then
