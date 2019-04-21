@@ -1,34 +1,42 @@
 #!/bin/sh
 
-if [ -z "$1" ]; then
-  CURRENT_DIR=$(dirname "$0")
-  EC2_SETTINGS=$(cat "$CURRENT_DIR"/ec2-instances.json)
-elif [ -f "$1" ]; then
-  EC2_SETTINGS=$(cat "$1")
-else
-  echo "The parameter = '$1' is not a file"
-  exit 1
-fi
-
 # cd to the current directory as it runs other shell scripts
 cd "$(dirname "$0")"
 
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
 
-# Create a Cloudformation stack from the local template `cloudformation-vpc.yaml`
+# parse options, note that whitespace is needed (e.g. -c 4) between an option and the option argument
+#  --vpc-stack: The Cloudformation stack name for defining VPC
 VPC_STACK_NAME="bench-vpc"
-SSH_LOCATION="$(curl ifconfig.co 2> /dev/null)/32"
-EXEC_UUID=$(uuidgen)
-
-echo "Creating the VPC"
-# aws cloudformation create-stack \
-#   --stack-name "${VPC_STACK_NAME}" \
-#   --template-body file://cloudformation-vpc.yaml \
-#   --capabilities CAPABILITY_NAMED_IAM \
-#   --parameters ParameterKey=SSHLocation,ParameterValue="${SSH_LOCATION}"
+EC2_SETTINGS=$(cat ../../data/ec2-instances.json)
+for OPT in "$@"
+do
+    case "$OPT" in
+        '--vpc-stack' )
+            if [ -z "$2" ] ; then
+                echo "option --vpc-stack requires an argument -- $1" 1>&2
+                exit 1
+            fi
+            VPC_STACK_NAME="$2"
+            shift 2
+            ;;
+        -*)
+            echo "illegal option -- '$(echo "$1" | sed 's/^-*//')'" 1>&2
+            exit 1
+            ;;
+        *)
+            if [ -f "$1" ] ; then
+                EC2_SETTINGS=$(cat "$1")
+                break
+            fi
+            ;;
+    esac
+done
 
 aws cloudformation wait stack-create-complete --stack-name "${VPC_STACK_NAME}"
+
+EXEC_UUID=$(uuidgen)
 
 # Variables to be passed upon EC2 creation in the next step
 DESCRIBED=$(aws cloudformation describe-stacks --stack-name "${VPC_STACK_NAME}")
@@ -37,6 +45,7 @@ IAM_INSTANCE_PROFILE_SSM=$(echo "${DESCRIBED}" | jq -c '.Stacks[0].Outputs[] | s
 
 # Create EC2 instances. Since CloudFormation doesn't support creation of a variable number of EC2 instances,
 # you need to create the instances via CLI.
+
 echo "Creating the WRK EC2 instance"
 WRK_INSTANCE_SETTINGS=$(echo "$EC2_SETTINGS" | jq -c '.wrk_instance')
 WRK_INSTANCE_TYPE=$(echo "$WRK_INSTANCE_SETTINGS" | jq -r '.instance_type')
