@@ -1,62 +1,56 @@
 #!/bin/sh
 
-if [ -n "$1" ]; then
-  EXEC_UUID="$1"
-else
-  echo "The first parameter = '$1' is empty but must be passed!"
-  exit 1
-fi
-
-if [ -z "$2" ]; then
-  CURRENT_DIR=$(dirname "$0")
-  EC2_SETTINGS=$(cat "$CURRENT_DIR"/ec2-instances.json)
-elif [ -f "$2" ]; then
-  EC2_SETTINGS=$(cat "$2")
-else
-  echo "The second parameter = '$2' is provided but not a file"
-  exit 1
-fi
-
 # cd to the current directory as it runs other shell scripts
 cd "$(dirname "$0")"
 
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
 
-SEED_NODE_IPV4=$(echo "$EC2_SETTINGS" | jq -r ".akka_backend_instances[] | select(.seed_node == true) | .ip_address_v4")
-for AKKA_BACKEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
+# parse options, note that whitespace is needed (e.g. -c 4) between an option and the option argument
+#  --seed-node-ipv4: The IPv4 address of the Akka Cluster seed node
+#  --akka-http-ipv4: The IPv4 address of the Akka HTTP server
+for OPT in "$@"
 do
-  aws ec2 wait instance-status-ok --instance-ids "${AKKA_BACKEND_INSTANCE_ID}"
-  aws ssm send-command \
-    --instance-ids "${AKKA_BACKEND_INSTANCE_ID}" \
-    --document-name "AWS-RunShellScript" \
-    --comment "running akka backend for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/backend.sh ${SEED_NODE_IPV4} ]" \
-    --output text \
-    --query "Command.CommandId"
+    case "$OPT" in
+        '--seed-node-ipv4' )
+            if [ -z "$2" ] ; then
+                echo "option --seed-node-ipv4 requires an argument -- $1" 1>&2
+                exit 1
+            fi
+            SEED_NODE_IPV4="$2"
+            shift 2
+            ;;
+        '--akka-http-ipv4' )
+            if [ -z "$2" ] ; then
+                echo "option --akka-http-ipv4 requires an argument -- $1" 1>&2
+                exit 1
+            fi
+            AKKA_HTTP_IPV4="$2"
+            shift 2
+            ;;
+        -*)
+            echo "illegal option -- '$(echo "$1" | sed 's/^-*//')'" 1>&2
+            exit 1
+            ;;
+        *)
+            if [ -n "$1" ] ; then
+                EXEC_UUID="$1"
+                break
+            fi
+            ;;
+    esac
 done
 
-for AKKA_HTTP_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
-do
-  aws ec2 wait instance-status-ok --instance-ids "${AKKA_HTTP_INSTANCE_ID}"
-  aws ssm send-command \
-    --instance-ids "${AKKA_HTTP_INSTANCE_ID}" \
-    --document-name "AWS-RunShellScript" \
-    --comment "running akka http for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/http.sh ${SEED_NODE_IPV4} ]" \
-    --output text \
-    --query "Command.CommandId"
-done
+COMMAND_ERROR=""
+if [ -z "$SEED_NODE_IPV4" ]; then
+  COMMAND_ERROR="${COMMAND_ERROR}ERROR: --seed-node-ipv4 must be provided.\n"
+elif [ -z "$AKKA_HTTP_IPV4" ]; then
+  COMMAND_ERROR="${COMMAND_ERROR}ERROR: --akka-http-ipv4 must be provided.\n"
+elif [ -z "$EXEC_UUID" ]; then
+  COMMAND_ERROR="${COMMAND_ERROR}ERROR: the argument for test execution UUID must be provided.\n"
+fi
 
-HTTP_IPV4=$(echo "$EC2_SETTINGS" | jq -r ".akka_http_instances[0].ip_address_v4")
-for AKKA_WRK_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=http"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
-do
-  aws ec2 wait instance-status-ok --instance-ids "${AKKA_WRK_INSTANCE_ID}"
-  aws ssm send-command \
-    --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
-    --document-name "AWS-RunShellScript" \
-    --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/wrk-client.sh ${HTTP_IPV4}:8080 ]" \
-    --output text \
-    --query "Command.CommandId"
-done
+if [ -n "${COMMAND_ERROR}" ]; then
+  echo "${COMMAND_ERROR}" 1 >&2
+  exit 1
+fi
