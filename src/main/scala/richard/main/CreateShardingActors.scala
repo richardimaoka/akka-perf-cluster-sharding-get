@@ -11,12 +11,10 @@ import richard.backend.actor.IdActor
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
+import scala.io.Source
 
 object CreateShardingActors {
   def main(args: Array[String]): Unit = {
-    val numShardActors: Int =
-      if(args.length > 0 && args(0).isInstanceOf[Int]) args(0).asInstanceOf[Int]
-      else 100
 
     val config = ConfigFactory.load("create-sharding-actors.conf")
     val system = ActorSystem(config.getString("actor-system-name"), config)
@@ -29,19 +27,19 @@ object CreateShardingActors {
       extractShardId = IdActor.extractShardId
     )
 
+    Thread.sleep(10000)
+
     implicit val timeout: Timeout = 1.second
     implicit val ec: ExecutionContext = system.dispatcher
-    for (_ <- 1 to numShardActors) {
-      val uuid = UUID.randomUUID()
+    val source = Source.fromFile("data/uuids.json")
+    for (uuid <- source.getLines()) {
       val asking = shardRegion ? IdActor.Create(uuid.toString)
-
       try {
         Await.result(asking.mapTo[String], 1.second)
         println("Successfully created " + uuid)
       } catch {
         case _: Throwable => println("Failed to create " + uuid)
       }
-
     }
 
     system.terminate()
