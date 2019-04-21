@@ -3,11 +3,14 @@ package richard.main
 import java.util.UUID
 
 import akka.actor.{ActorSystem, Props}
-import akka.pattern.ask
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
+import akka.pattern.ask
+import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import richard.backend.actor.IdActor
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 object CreateShardingActors {
@@ -27,6 +30,8 @@ object CreateShardingActors {
       extractShardId = IdActor.extractShardId
     )
 
+    implicit val timeout: Timeout = 1.second
+    implicit val ec: ExecutionContext = system.dispatcher
     for (_ <- 1 to numShardActors) {
       val uuid = UUID.randomUUID()
       (shardRegion ? IdActor.Create(uuid.toString)).mapTo[String].onComplete{
