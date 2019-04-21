@@ -103,7 +103,7 @@ do
     --instance-ids "${AKKA_WRK_INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
     --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
-    --parameters commands="[ docker run richard-perf-wrk:latest http://${HTTP_IPV4}:8080 ]" \
+    --parameters commands="[ docker run richard-perf-wrk:latest http://${AKKA_HTTP_IPV4}:8080 ]" \
     --output text \
     --query "Command.CommandId"
 done
