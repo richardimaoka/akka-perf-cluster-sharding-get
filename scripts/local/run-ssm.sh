@@ -68,6 +68,9 @@ aws ssm send-command \
   --output text \
   --query "Command.CommandId"
 
+echo "sleeping to give the seed node enough warm-up time..."
+sleep 30
+
 echo "starting backend"
 for AKKA_BACKEND_INSTANCE_ID in $(aws ec2 describe-instances --filters "Name=tag:role,Values=backend" "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
 do
@@ -80,6 +83,9 @@ do
     --output text \
     --query "Command.CommandId"
 done
+
+echo "sleeping to give the backend enough warm-up time..."
+sleep 30
 
 echo "creating sharding actors"
 # Use the wrk EC2 instance as other Akka backend/http instances might be short on memory
@@ -108,7 +114,7 @@ do
 done
 
 echo "sleeping until everything is ready..."
-sleep 60
+sleep 30
 
 echo "running wrk"
 WRK_INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:role,Values=wrk"  "Name=tag:exec-id,Values=${EXEC_UUID}" --query "Reservations[*].Instances[*].InstanceId" --output text)
