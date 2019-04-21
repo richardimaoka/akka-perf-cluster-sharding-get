@@ -11,6 +11,7 @@ class IdActor extends Actor {
     case Create(i) =>
       _id = i
       context.become(receiveInitialized)
+      sender() ! "Created"
     case _ =>
       context.stop(self)
   }

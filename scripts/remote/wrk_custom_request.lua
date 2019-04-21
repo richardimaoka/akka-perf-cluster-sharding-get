@@ -18,19 +18,21 @@ function lines_from(file)
   return lines
 end
 
-local lines = lines_from("../../data/uuids.txt")
+-- Initialize the requests array iterator
 requests = {}
-for i=1, #lines do
-  requests[i] = wrk.format(
-    "GET",
-    lines[i]
-  )
+function init(args)
+  print("Trying to read uuids from " .. args[1])
+  local lines = lines_from(args[1])
+  print(#lines .. " uuids are read")
+
+  for i=1, #lines do
+    local url = args[0] .. "/actors/" .. lines[i]
+    table.insert(requests, wrk.format("GET", url))
+  end
 end
 
--- Initialize the requests array iterator
 counter = 1
-
-request = function()
+function request()
   -- Increment the counter
   counter = counter + 1
 
@@ -41,4 +43,8 @@ request = function()
 
   -- Return the request object with the current URL path
   return requests[counter]
+end
+
+function done(summary, latency, requests)
+  print("done!")
 end

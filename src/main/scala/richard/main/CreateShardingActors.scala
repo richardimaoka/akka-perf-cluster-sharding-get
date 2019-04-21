@@ -3,9 +3,12 @@ package richard.main
 import java.util.UUID
 
 import akka.actor.{ActorSystem, Props}
+import akka.pattern.ask
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import com.typesafe.config.ConfigFactory
 import richard.backend.actor.IdActor
+
+import scala.util.{Failure, Success}
 
 object CreateShardingActors {
   def main(args: Array[String]): Unit = {
@@ -26,7 +29,10 @@ object CreateShardingActors {
 
     for (_ <- 1 to numShardActors) {
       val uuid = UUID.randomUUID()
-      shardRegion ! IdActor.Create(uuid.toString)
+      (shardRegion ? IdActor.Create(uuid.toString)).mapTo[String].onComplete{
+        case Success(_) => println("Success creating " + uuid)
+        case Failure(e) => println("Failed creating " + uuid, e)
+      }
     }
 
     system.terminate()
