@@ -5,6 +5,7 @@ FROM czerasz/wrk-json:latest
 WORKDIR /app
 
 COPY scripts scripts
+COPY data data
 
 CMD ["-t", "12", "-c", "400", "-d", "30s" ]
 ENTRYPOINT ["wrk", "-s scripts/remote/wrk_custom_request.lua"]
