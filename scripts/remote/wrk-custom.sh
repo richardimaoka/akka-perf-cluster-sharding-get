@@ -13,4 +13,7 @@ cd "$(dirname "$0")"
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
 
-wrk -s "${pwd}/wrk_custom_request.lua" -t 2 -c 10 -d 30 "http://${AKKA_HTTP_NODE}:8080" "$(pwd)/../../data/uuids.txt"
+docker run richard-perf-wrk:latest \
+  -t 2 -c 10 -d 30 \
+  "http://${AKKA_HTTP_NODE}:8080" \
+  "$(pwd)/../../data/uuids.txt"
