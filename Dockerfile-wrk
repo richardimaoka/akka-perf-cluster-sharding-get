@@ -5,5 +5,5 @@ WORKDIR /app
 COPY scripts scripts
 COPY data data
 
-ENTRYPOINT ["scripts/remote/wrk_custom.sh"]
+ENTRYPOINT ["scripts/remote/wrk-docustom.sh"]
 
