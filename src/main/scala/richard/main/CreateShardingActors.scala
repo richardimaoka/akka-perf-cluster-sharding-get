@@ -3,6 +3,7 @@ package richard.main
 import java.util.UUID
 
 import akka.actor.{ActorSystem, Props}
+import akka.cluster.Cluster
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import akka.pattern.ask
 import akka.util.Timeout
@@ -41,6 +42,11 @@ object CreateShardingActors {
         case _: Throwable => println("Failed to create " + uuid)
       }
     }
+
+    val cluster = Cluster(system)
+    cluster.leave(cluster.selfAddress)
+
+    Thread.sleep(10000)
 
     system.terminate()
   }
