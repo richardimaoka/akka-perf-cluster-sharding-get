@@ -23,7 +23,7 @@ object CreateShardingActors {
     val shardRegion = ClusterSharding(system).start(
       typeName = "IdActor",
       entityProps = Props[IdActor],
-      settings = ClusterShardingSettings(system),
+      settings = ClusterShardingSettings(system).withRole("backend"),
       extractEntityId = IdActor.extractEntityId,
       extractShardId = IdActor.extractShardId
     )
