@@ -122,6 +122,6 @@ aws ssm send-command \
   --instance-ids "${WRK_INSTANCE_ID}" \
   --document-name "AWS-RunShellScript" \
   --comment "running akka wrk for benchmarking for exec id = ${EXEC_UUID}" \
-  --parameters commands="[ docker run richard-perf-wrk:latest http://${AKKA_HTTP_IPV4}:8080 ]" \
+  --parameters commands="[ docker run richard-perf-wrk:latest ${AKKA_HTTP_IPV4} ]" \
   --output text \
   --query "Command.CommandId"
