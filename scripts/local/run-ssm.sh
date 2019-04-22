@@ -63,7 +63,7 @@ aws ec2 wait instance-status-ok --instance-ids "${AKKA_SEED_NODE_INSTANCE_ID}"
 aws ssm send-command \
   --instance-ids "${AKKA_SEED_NODE_INSTANCE_ID}" \
   --document-name "AWS-RunShellScript" \
-  --comment "creating sharding actors for exec id = ${EXEC_UUID}" \
+  --comment "starting seed node for exec id = ${EXEC_UUID}" \
   --parameters commands="[ /home/ec2-user/akka-perf-cluster-sharding-get/scripts/remote/seed-node.sh ${SEED_NODE_IPV4} ]" \
   --output text \
   --query "Command.CommandId"
